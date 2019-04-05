@@ -37,6 +37,14 @@ namespace ChangeImagePath
             set { backupDocument = value; }
         }
 
+        private bool skipUpload;
+
+        public bool SkipUpload
+        {
+            get { return skipUpload; }
+            set { skipUpload = value; }
+        }
+
         public MainWindow()
         {
             InitializeComponent();
@@ -44,6 +52,7 @@ namespace ChangeImagePath
             logWriter = new LogWriter(Directory.GetCurrentDirectory());
 
             BackupDocument = true;
+            SkipUpload = true;
 
             this.DataContext = this;
         }
@@ -156,34 +165,39 @@ namespace ChangeImagePath
                                         {
                                             foreach (XmlNode variable in docChild.ChildNodes)
                                             {
-                                                XmlAttributeCollection attributes = variable.Attributes;
-
-                                                //string varId = variable.Attributes["id"].Value;
-                                                string varName = variable.Attributes["name"].Value;
-
-                                                if (attributes["dataType"] != null && attributes["dataType"].Value == "image")
-                                                {
-                                                    if (attributes["imageFromPulldown"].Value == "true")
-                                                    {
-                                                        //attributes["imagePulldownDirectory"].Value = "%UploadDirectory%";
-                                                        if (attributes["imagePulldownDirectoryVariable"] == null)
-                                                        {
-                                                            XmlAttribute xmlAttribute = xmlDocument.CreateAttribute("imagePulldownDirectoryVariable");
-                                                            xmlAttribute.Value = "upload-variable";
-                                                            attributes.Append(xmlAttribute);
-                                                        }
-                                                        else
-                                                        {
-                                                            attributes["imagePulldownDirectoryVariable"].Value = "upload-variable";
-                                                        }
-                                                    }
-                                                   
-                                                }
-
-                                                if (varName == "UploadDirectory")
+                                                if (variable.Attributes["name"].Value == "UploadDirectory")
                                                 {
                                                     variableFound = true;
                                                 }
+                                            }
+
+                                            if (skipUpload == false || (skipUpload == true && variableFound == false))
+                                            {
+
+                                                foreach (XmlNode variable in docChild.ChildNodes)
+                                                {
+                                                    XmlAttributeCollection attributes = variable.Attributes;
+
+                                                    if (attributes["dataType"] != null && attributes["dataType"].Value == "image")
+                                                    {
+                                                        if (attributes["imageFromPulldown"].Value == "true")
+                                                        {
+                                                            //attributes["imagePulldownDirectory"].Value = "%UploadDirectory%";
+                                                            if (attributes["imagePulldownDirectoryVariable"] == null)
+                                                            {
+                                                                XmlAttribute xmlAttribute = xmlDocument.CreateAttribute("imagePulldownDirectoryVariable");
+                                                                xmlAttribute.Value = "upload-variable";
+                                                                attributes.Append(xmlAttribute);
+                                                            }
+                                                            else
+                                                            {
+                                                                attributes["imagePulldownDirectoryVariable"].Value = "upload-variable";
+                                                            }
+                                                        }
+
+                                                    }
+                                                }
+                                                
                                             }
 
                                             if (variableFound == false)
@@ -205,63 +219,69 @@ namespace ChangeImagePath
                                         }
                                     }
 
-                                    
 
-                                    if (eventActionsNode == null)
+                                    if (skipUpload == false || (skipUpload == true && variableFound == false))
                                     {
-                                        eventActionsNode = xmlDocument.CreateElement("eventActions");
-                                        childNode.AppendChild(eventActionsNode);
-                                    }
-
-                                    XmlNode actionItem = null;
-
-                                    if (eventActionsNode.HasChildNodes)
-                                    {
-                                        actionItem = eventActionsNode.SelectSingleNode("//item[id='sean-action']");
-                                    }
-
-                                    if (actionItem == null)
-                                    {
-                                        XmlElement actionItemEl = xmlDocument.CreateElement("item");
-                                        
-                                        actionItemEl.SetAttribute("id", "sean-action");
-                                        actionItemEl.SetAttribute("name", "SetUploadDirectory");
-                                        actionItemEl.SetAttribute("asynchronous", "false");
-                                        actionItemEl.SetAttribute("disabled", "false");
-                                        actionItemEl.SetAttribute("eventNames", ";DocumentFullyLoaded;");
-                                        actionItemEl.SetAttribute("executionDelay", "50");
-                                        actionItemEl.SetAttribute("executionType", "after");
-
-                                        actionItem = actionItemEl;
-
-                                        eventActionsNode.AppendChild(actionItem);
-                                        
-                                    }
-
-                                    if (!actionItem.HasChildNodes)
-                                    {
-                                        XmlElement actionActionEl = xmlDocument.CreateElement("action");
-                                        actionActionEl.SetAttribute("notes", "");
-                                        actionActionEl.SetAttribute("xml", "&lt;action returnType=&quot;&quot;&gt;&lt;line number=&quot;1&quot; type=&quot;execute&quot; execute1=&quot;JavaScript&quot; execute2=&quot;eval&quot; execute_arg_script1=&quot;long string&quot; execute_arg_scriptInput=&quot;&quot;/&gt;&lt;/action&gt;");
-
-                                        actionItem.AppendChild(actionActionEl);
-                                    }
-
-                                    string newJavaScript = File.ReadAllText(Directory.GetCurrentDirectory() + "\\jsCompressed.js");
-
-                                    XmlDocument actionDoc = new XmlDocument();
-                                    actionDoc.LoadXml(WebUtility.HtmlDecode(actionItem.FirstChild.Attributes["xml"].Value));
-
-                                    foreach (XmlNode actionItemChild in actionDoc.FirstChild.ChildNodes)
-                                    {
-                                        if (actionItemChild.Attributes["execute1"] != null)
+                                        if (eventActionsNode == null)
                                         {
-                                            if (actionItemChild.Attributes["execute1"].Value == "JavaScript")
+                                            eventActionsNode = xmlDocument.CreateElement("eventActions");
+                                            childNode.AppendChild(eventActionsNode);
+                                        }
+
+                                        XmlNode actionItem = null;
+
+                                        if (eventActionsNode.HasChildNodes)
+                                        {
+                                            actionItem = eventActionsNode.SelectSingleNode("//item[id='sean-action']");
+                                        }
+
+                                        if (actionItem == null)
+                                        {
+                                            XmlElement actionItemEl = xmlDocument.CreateElement("item");
+
+                                            actionItemEl.SetAttribute("id", "sean-action");
+                                            actionItemEl.SetAttribute("name", "SetUploadDirectory");
+                                            actionItemEl.SetAttribute("asynchronous", "false");
+                                            actionItemEl.SetAttribute("disabled", "false");
+                                            actionItemEl.SetAttribute("eventNames", ";DocumentFullyLoaded;");
+                                            actionItemEl.SetAttribute("executionDelay", "50");
+                                            actionItemEl.SetAttribute("executionType", "after");
+
+                                            actionItem = actionItemEl;
+
+                                            eventActionsNode.AppendChild(actionItem);
+
+                                        }
+
+                                        if (!actionItem.HasChildNodes)
+                                        {
+                                            XmlElement actionActionEl = xmlDocument.CreateElement("action");
+                                            actionActionEl.SetAttribute("notes", "");
+                                            actionActionEl.SetAttribute("xml", "&lt;action returnType=&quot;&quot;&gt;&lt;line number=&quot;1&quot; type=&quot;execute&quot; execute1=&quot;JavaScript&quot; execute2=&quot;eval&quot; execute_arg_script1=&quot;long string&quot; execute_arg_scriptInput=&quot;&quot;/&gt;&lt;/action&gt;");
+
+                                            actionItem.AppendChild(actionActionEl);
+                                        }
+
+                                        string newJavaScript = File.ReadAllText(Directory.GetCurrentDirectory() + "\\jsCompressed.js");
+
+                                        XmlDocument actionDoc = new XmlDocument();
+                                        actionDoc.LoadXml(WebUtility.HtmlDecode(actionItem.FirstChild.Attributes["xml"].Value));
+
+                                        foreach (XmlNode actionItemChild in actionDoc.FirstChild.ChildNodes)
+                                        {
+                                            if (actionItemChild.Attributes["execute1"] != null)
                                             {
-                                                actionItemChild.Attributes["execute_arg_scriptInput"].Value = newJavaScript;
-                                                actionItem.FirstChild.Attributes["xml"].Value = actionDoc.OuterXml;
+                                                if (actionItemChild.Attributes["execute1"].Value == "JavaScript")
+                                                {
+                                                    actionItemChild.Attributes["execute_arg_scriptInput"].Value = newJavaScript;
+                                                    actionItem.FirstChild.Attributes["xml"].Value = actionDoc.OuterXml;
+                                                }
                                             }
                                         }
+                                    }
+                                    else
+                                    {
+                                        logWriter.WriteLog("Skipped document at " + path, "Skipped");
                                     }
                                     
                                 }

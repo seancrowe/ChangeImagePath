@@ -7,12 +7,12 @@
         mc:Ignorable="d"
         Title="ChangeImagePath" Height="450" Width="800">
     <Grid>
-        <Label Content="Action Replacer" FontSize="25" HorizontalAlignment="Left" HorizontalContentAlignment="Center" Margin="236,10,0,0" VerticalAlignment="Top" Height="51" Width="309"/>
+        <Label Content="Change Image Path" FontSize="25" HorizontalAlignment="Left" HorizontalContentAlignment="Center" Margin="236,10,0,0" VerticalAlignment="Top" Height="51" Width="309"/>
         <TextBlock FontSize="16" HorizontalAlignment="Left" Margin="95,66,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Height="162" Width="608">The following script, code, project, or app is provide "as is" and "with all faults." CHILI Publish, and their employees, make no representations or warranties of any kind concerning the safety, suitability, lack of viruses, inaccuracies, typographical errors, or other harmful components of this script, code, project, or app. You are also solely responsible for the protection of your server and the backup of your data. CHILI Publish, and their employees, will not be liable for any damages you may suffer in connection with using, modifying, or distributing this  script, code, project, or app.</TextBlock>
-        <Button Content="Select Files" FontSize="20" HorizontalAlignment="Left" Margin="454,283,0,0" VerticalAlignment="Top" Width="141" Click="OnSelectFiles"/>
-        <Button Content="Select Folder" FontSize="20" HorizontalAlignment="Left" Margin="195,283,0,0" VerticalAlignment="Top" Width="141" Click="OnSelectFolder"/>
-        <Button Content="Replace Actions" Background="DarkOrange" HorizontalAlignment="Left" Margin="341,363,0,0" VerticalAlignment="Top" Width="111" Height="29" Click="OnReplace"/>
-        <CheckBox Content="Backup Originals" HorizontalAlignment="Left" Margin="504,369,0,0" VerticalAlignment="Top" IsChecked="{Binding Path=BackupDocument}" RenderTransformOrigin="0.5,0.5">
+        <Button Content="Select Files" FontSize="20" HorizontalAlignment="Left" Margin="454,253,0,0" VerticalAlignment="Top" Width="141" Click="OnSelectFiles"/>
+        <Button Content="Select Folder" FontSize="20" HorizontalAlignment="Left" Margin="195,253,0,0" VerticalAlignment="Top" Width="141" Click="OnSelectFolder"/>
+        <Button Content="Change Paths" Background="DarkOrange" HorizontalAlignment="Left" Margin="346,363,0,0" VerticalAlignment="Top" Width="111" Height="29" Click="OnReplace"/>
+        <CheckBox Content="Backup Originals" HorizontalAlignment="Left" Margin="542,369,0,0" VerticalAlignment="Top" IsChecked="{Binding Path=BackupDocument}" RenderTransformOrigin="0.5,0.5">
             <CheckBox.RenderTransform>
                 <TransformGroup>
                     <ScaleTransform ScaleX="1.5" ScaleY="1.5"/>
@@ -22,7 +22,18 @@
                 </TransformGroup>
             </CheckBox.RenderTransform>
         </CheckBox>
-        <TextBox Visibility="Hidden" Name="WaitBox" HorizontalAlignment="Left" Height="109" Margin="157,283,0,0" TextWrapping="Wrap" Text="Please Wait" FontSize="35" VerticalAlignment="Top" Width="510" TextAlignment="Center"/>
+        <CheckBox Content="If UploadDirectory variable exists, skip document" HorizontalAlignment="Left" Margin="272,313,0,0" VerticalAlignment="Top" IsChecked="{Binding SkipUpload}" RenderTransformOrigin="0.5,0.5">
+            <CheckBox.RenderTransform>
+                <TransformGroup>
+                    <ScaleTransform ScaleX="1.5" ScaleY="1.5"/>
+                    <SkewTransform/>
+                    <RotateTransform/>
+                    <TranslateTransform/>
+                </TransformGroup>
+            </CheckBox.RenderTransform>
+        </CheckBox>
+
+        <TextBox Visibility="Hidden" Name="WaitBox" HorizontalAlignment="Left" Height="149" Margin="157,245,0,0" TextWrapping="Wrap" Text="Please Wait" FontSize="35" VerticalAlignment="Top" Width="510" TextAlignment="Center"/>
         
 
     </Grid>
